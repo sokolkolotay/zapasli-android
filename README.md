@@ -4,11 +4,12 @@ Android-клиент сервиса совместного учёта домаш
 
 ## Текущий статус
 
-Создан foundation-проект: настроены Jetpack Compose, Navigation 3, светлая и тёмная темы, фирменная палитра, типографика Onest и первый демонстрационный экран. Для каждого push и pull request настроена автоматическая проверка сборки, unit-тестов и Android Lint.
+Создан foundation-проект: настроены Jetpack Compose, Navigation 3, светлая и тёмная темы, фирменная палитра, типографика Onest и первый демонстрационный экран. Подключён offline-фундамент на Hilt, Room и DataStore. Для каждого push и pull request настроена автоматическая проверка сборки, unit-тестов и Android Lint.
 
 ## Технологии
 
 - Kotlin, Jetpack Compose, Material 3
+- Hilt, Room, DataStore, KSP
 - Android Gradle Plugin 9.3.2, Gradle 9.5.0
 - compileSdk / targetSdk 37, minSdk 26
 - Application ID: `ru.zapasli.app`
@@ -24,6 +25,19 @@ Android-клиент сервиса совместного учёта домаш
 ```powershell
 .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
 ```
+
+## Архитектура
+
+- `domain/pantry` — модели и контракт кладовой.
+- `core/database` — локальная Room-база и DAO.
+- `data/pantry` — offline-реализация репозитория.
+- `core/preferences` — только несекретные настройки интерфейса в DataStore.
+
+Правила работы с ключами, токенами и уязвимостями описаны в `SECURITY.md`.
+
+## Offline-релиз
+
+Тег `v0.1.0-offline` будет создан только после завершения полного offline-сценария, успешных тестов, lint, сборки и проверки состава коммита на секреты и локальные файлы.
 
 ## Ближайшие этапы
 

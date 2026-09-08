@@ -8,3 +8,15 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Credentials, signing keys and machine-specific secrets
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore.properties
+secrets.properties
+**/google-services.json
