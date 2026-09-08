@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Zapasli</string>
+    <string name="foundation_subtitle">Продукты дома — под контролем</string>
+    <string name="sync_status">Синхронизировано только что</string>
+    <string name="attention_title">Требует внимания</string>
+    <string name="attention_description">3 продукта стоит использовать в ближайшее время</string>
+    <string name="open_pantry">Открыть запасы</string>
+    <string name="scan_product">Сканировать продукт</string>
+    <string name="product_name">Молоко 3,2%%</string>
+    <string name="product_location">Холодильник · верхняя полка</string>
+    <string name="expiry_soon">Осталось 2 дня</string>
+    <string name="nutrition_title">Пищевая ценность на 100 г</string>
+    <string name="energy_label">Энергия</string>
+    <string name="calories_value">60 ккал</string>
+    <string name="protein_label">Белки</string>
+    <string name="fat_label">Жиры</string>
+    <string name="carbs_label">Углеводы</string>
+    <string name="protein_value">3,2 г</string>
+    <string name="fat_value">3,2 г</string>
+    <string name="carbs_value">4,7 г</string>
+    <string name="preview_notice">Первый экран демонстрирует основу дизайна Zapasli. Учёт продуктов, сканирование чеков и семейные профили появятся на следующих этапах.</string>
+</resources>

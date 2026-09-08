@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Zapasli</string>
+    <string name="foundation_subtitle">Food at home — under control</string>
+    <string name="sync_status">Synced just now</string>
+    <string name="attention_title">Needs attention</string>
+    <string name="attention_description">3 products should be used soon</string>
+    <string name="open_pantry">Open pantry</string>
+    <string name="scan_product">Scan product</string>
+    <string name="product_name">Milk 3.2%%</string>
+    <string name="product_location">Fridge · top shelf</string>
+    <string name="expiry_soon">2 days left</string>
+    <string name="nutrition_title">Nutrition per 100 g</string>
+    <string name="energy_label">Energy</string>
+    <string name="calories_value">60 kcal</string>
+    <string name="protein_label">Protein</string>
+    <string name="fat_label">Fat</string>
+    <string name="carbs_label">Carbs</string>
+    <string name="protein_value">3.2 g</string>
+    <string name="fat_value">3.2 g</string>
+    <string name="carbs_value">4.7 g</string>
+    <string name="preview_notice">The first screen demonstrates the Zapasli design foundation. Product accounting, receipt scanning and family profiles are next.</string>
+</resources>
