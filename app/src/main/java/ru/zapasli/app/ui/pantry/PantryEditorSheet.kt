@@ -18,6 +18,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -27,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,10 @@ import java.util.Locale
 @Composable
 internal fun PantryEditorSheet(
     item: PantryItem?,
+    scannedBarcode: String?,
+    productLookup: ProductLookupUiState,
+    onScanBarcode: () -> Unit,
+    onBarcodeInputChanged: () -> Unit,
     onDismiss: () -> Unit,
     onSave: (PantryItemInput) -> Unit,
 ) {
@@ -90,6 +96,27 @@ internal fun PantryEditorSheet(
     val unit = QuantityUnit.valueOf(unitName)
     val location = StorageLocation.valueOf(locationName)
     val expiresOn = expiryEpochDay?.let(LocalDate::ofEpochDay)
+
+    LaunchedEffect(scannedBarcode, productLookup) {
+        scannedBarcode?.let { barcode = it }
+        val found = productLookup as? ProductLookupUiState.Found ?: return@LaunchedEffect
+        barcode = found.product.barcode
+        if (name.isBlank()) name = found.product.name.orEmpty()
+        found.product.nutritionPer100g?.let { nutrition ->
+            if (calories.isBlank()) {
+                calories = nutrition.caloriesKcal?.toEditorNumber().orEmpty()
+            }
+            if (protein.isBlank()) {
+                protein = nutrition.proteinGrams?.toEditorNumber().orEmpty()
+            }
+            if (fat.isBlank()) {
+                fat = nutrition.fatGrams?.toEditorNumber().orEmpty()
+            }
+            if (carbohydrates.isBlank()) {
+                carbohydrates = nutrition.carbohydratesGrams?.toEditorNumber().orEmpty()
+            }
+        }
+    }
 
     ModalBottomSheet(
         modifier = Modifier.testTag("product_editor"),
@@ -136,20 +163,32 @@ internal fun PantryEditorSheet(
             )
 
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("barcode_input"),
                 value = barcode,
                 onValueChange = {
                     barcode = it.filter(Char::isDigit).take(14)
                     validationError = null
+                    onBarcodeInputChanged()
                 },
                 label = { Text(stringResource(R.string.barcode_label)) },
                 supportingText = { Text(stringResource(R.string.barcode_hint)) },
+                trailingIcon = {
+                    TextButton(
+                        modifier = Modifier.testTag("scan_barcode"),
+                        onClick = onScanBarcode,
+                    ) {
+                        Text(stringResource(R.string.scan))
+                    }
+                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next,
                 ),
             )
+            ProductLookupStatus(productLookup)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -344,6 +383,38 @@ internal fun PantryEditorSheet(
                 },
             )
         }
+    }
+}
+
+@Composable
+private fun ProductLookupStatus(state: ProductLookupUiState) {
+    when (state) {
+        ProductLookupUiState.Idle -> Unit
+        is ProductLookupUiState.Loading -> Column(
+            verticalArrangement = Arrangement.spacedBy(ZapasliSpacing.xs),
+        ) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            Text(
+                text = stringResource(R.string.product_lookup_loading),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        is ProductLookupUiState.Found -> Text(
+            text = stringResource(R.string.product_lookup_found),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodySmall,
+        )
+        is ProductLookupUiState.NotFound -> Text(
+            text = stringResource(R.string.product_lookup_not_found),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
+        is ProductLookupUiState.Failed -> Text(
+            text = stringResource(R.string.product_lookup_failed),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 

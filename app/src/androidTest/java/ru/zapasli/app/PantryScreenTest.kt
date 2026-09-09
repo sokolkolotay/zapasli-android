@@ -1,5 +1,6 @@
 package ru.zapasli.app
 
+import android.Manifest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -9,12 +10,23 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class PantryScreenTest {
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun grantCameraPermission() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.uiAutomation.grantRuntimePermission(
+            instrumentation.targetContext.packageName,
+            Manifest.permission.CAMERA,
+        )
+    }
 
     @Test
     fun pantryScreenIsDisplayed() {
@@ -25,6 +37,18 @@ class PantryScreenTest {
     fun emptyPantryOpensProductEditor() {
         waitForTag("add_first_product")
         composeRule.onNodeWithTag("add_first_product").performClick()
+        composeRule.onNodeWithTag("product_editor").assertIsDisplayed()
+    }
+
+    @Test
+    fun scannerCanOpenAndReturnToManualEntry() {
+        waitForTag("add_first_product")
+        composeRule.onNodeWithTag("add_first_product").performClick()
+        composeRule.onNodeWithTag("scan_barcode").performClick()
+
+        waitForTag("barcode_scanner")
+        composeRule.onNodeWithTag("barcode_scanner").assertIsDisplayed()
+        composeRule.onNodeWithTag("scanner_manual_entry").performClick()
         composeRule.onNodeWithTag("product_editor").assertIsDisplayed()
     }
 

@@ -2,6 +2,7 @@ package ru.zapasli.app.ui.pantry
 
 import ru.zapasli.app.core.model.ExpiryState
 import ru.zapasli.app.core.model.expiryState
+import ru.zapasli.app.domain.catalog.ProductSuggestion
 import ru.zapasli.app.domain.pantry.NutritionPer100g
 import ru.zapasli.app.domain.pantry.PantryItem
 import ru.zapasli.app.domain.pantry.QuantityUnit
@@ -17,7 +18,16 @@ data class PantryUiState(
     val attentionItemCount: Int = 0,
     val loadFailed: Boolean = false,
     val message: PantryMessage? = null,
+    val productLookup: ProductLookupUiState = ProductLookupUiState.Idle,
 )
+
+sealed interface ProductLookupUiState {
+    data object Idle : ProductLookupUiState
+    data class Loading(val barcode: String) : ProductLookupUiState
+    data class Found(val product: ProductSuggestion) : ProductLookupUiState
+    data class NotFound(val barcode: String) : ProductLookupUiState
+    data class Failed(val barcode: String) : ProductLookupUiState
+}
 
 enum class PantryFilter {
     ALL,

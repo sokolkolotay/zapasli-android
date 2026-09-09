@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,6 +72,7 @@ import ru.zapasli.app.domain.pantry.NutritionPer100g
 import ru.zapasli.app.domain.pantry.PantryItem
 import ru.zapasli.app.domain.pantry.QuantityUnit
 import ru.zapasli.app.domain.pantry.StorageLocation
+import ru.zapasli.app.ui.scanner.BarcodeScannerDialog
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -89,6 +91,8 @@ fun PantryRoute(
     var editorItem by remember { mutableStateOf<PantryItem?>(null) }
     var showEditor by remember { mutableStateOf(false) }
     var deleteCandidate by remember { mutableStateOf<PantryItem?>(null) }
+    var showScanner by rememberSaveable { mutableStateOf(false) }
+    var scannedBarcode by rememberSaveable { mutableStateOf<String?>(null) }
 
     val messageText = uiState.message?.let { message -> pantryMessageText(message) }
     LaunchedEffect(uiState.message, messageText) {
@@ -103,10 +107,14 @@ fun PantryRoute(
         snackbarHostState = snackbarHostState,
         onAddProduct = {
             editorItem = null
+            scannedBarcode = null
+            viewModel.clearProductLookup()
             showEditor = true
         },
         onEditProduct = { item ->
             editorItem = item
+            scannedBarcode = null
+            viewModel.clearProductLookup()
             showEditor = true
         },
         onDeleteProduct = { deleteCandidate = it },
@@ -118,11 +126,39 @@ fun PantryRoute(
     if (showEditor) {
         PantryEditorSheet(
             item = editorItem,
-            onDismiss = { showEditor = false },
+            scannedBarcode = scannedBarcode,
+            productLookup = uiState.productLookup,
+            onScanBarcode = {
+                scannedBarcode = null
+                viewModel.clearProductLookup()
+                showScanner = true
+            },
+            onBarcodeInputChanged = {
+                scannedBarcode = null
+                viewModel.clearProductLookup()
+            },
+            onDismiss = {
+                showEditor = false
+                scannedBarcode = null
+                viewModel.clearProductLookup()
+            },
             onSave = { input ->
                 viewModel.saveItem(input)
                 showEditor = false
+                scannedBarcode = null
+                viewModel.clearProductLookup()
             },
+        )
+    }
+
+    if (showScanner) {
+        BarcodeScannerDialog(
+            onBarcodeDetected = { barcode ->
+                showScanner = false
+                scannedBarcode = barcode
+                viewModel.lookupProduct(barcode)
+            },
+            onDismiss = { showScanner = false },
         )
     }
 

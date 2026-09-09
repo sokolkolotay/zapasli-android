@@ -3,7 +3,9 @@ package ru.zapasli.app.ui.pantry
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,6 +19,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.zapasli.app.domain.pantry.PantryItem
 import ru.zapasli.app.domain.pantry.PantryRepository
+import ru.zapasli.app.domain.catalog.ProductCatalogRepository
+import ru.zapasli.app.domain.catalog.ProductCatalogResult
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -25,10 +29,13 @@ import javax.inject.Inject
 @HiltViewModel
 class PantryViewModel @Inject constructor(
     private val pantryRepository: PantryRepository,
+    private val productCatalogRepository: ProductCatalogRepository,
 ) : ViewModel() {
     private val selectedFilter = MutableStateFlow(PantryFilter.ALL)
     private val message = MutableStateFlow<PantryMessage?>(null)
     private val retrySignal = MutableStateFlow(0)
+    private val productLookup = MutableStateFlow<ProductLookupUiState>(ProductLookupUiState.Idle)
+    private var lookupJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val itemsResult: Flow<ItemsResult> = retrySignal.flatMapLatest {
@@ -42,18 +49,21 @@ class PantryViewModel @Inject constructor(
         itemsResult,
         selectedFilter,
         message,
-    ) { result, filter, currentMessage ->
+        productLookup,
+    ) { result, filter, currentMessage, currentProductLookup ->
         when (result) {
             ItemsResult.Loading -> PantryUiState(
                 isLoading = true,
                 selectedFilter = filter,
                 message = currentMessage,
+                productLookup = currentProductLookup,
             )
             ItemsResult.Error -> PantryUiState(
                 isLoading = false,
                 selectedFilter = filter,
                 loadFailed = true,
                 message = currentMessage,
+                productLookup = currentProductLookup,
             )
             is ItemsResult.Content -> {
                 val today = LocalDate.now()
@@ -64,6 +74,7 @@ class PantryViewModel @Inject constructor(
                     totalItemCount = result.items.size,
                     attentionItemCount = result.items.attentionCount(today),
                     message = currentMessage,
+                    productLookup = currentProductLookup,
                 )
             }
         }
@@ -128,6 +139,32 @@ class PantryViewModel @Inject constructor(
 
     fun consumeMessage() {
         message.value = null
+    }
+
+    fun lookupProduct(barcode: String) {
+        lookupJob?.cancel()
+        productLookup.value = ProductLookupUiState.Loading(barcode)
+        lookupJob = viewModelScope.launch {
+            val result = try {
+                productCatalogRepository.findByBarcode(barcode)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                ProductCatalogResult.Unavailable
+            }
+
+            productLookup.value = when (result) {
+                is ProductCatalogResult.Found -> ProductLookupUiState.Found(result.product)
+                ProductCatalogResult.NotFound -> ProductLookupUiState.NotFound(barcode)
+                ProductCatalogResult.Unavailable -> ProductLookupUiState.Failed(barcode)
+            }
+        }
+    }
+
+    fun clearProductLookup() {
+        lookupJob?.cancel()
+        lookupJob = null
+        productLookup.value = ProductLookupUiState.Idle
     }
 
     private sealed interface ItemsResult {
