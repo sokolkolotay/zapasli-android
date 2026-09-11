@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Zapasli</string>
     <string name="pantry_title">My pantry</string>
+    <string name="pantry_user_summary">%1$s · %2$s</string>
     <plurals name="pantry_item_count">
         <item quantity="one">%d product</item>
         <item quantity="other">%d products</item>
@@ -99,4 +100,28 @@
     <string name="error_invalid_quantity">Quantity must be greater than zero</string>
     <string name="error_invalid_barcode">Barcode must contain 8 to 14 digits</string>
     <string name="error_invalid_nutrition">Nutrition values must be non-negative numbers</string>
+    <string name="auth_welcome_title">Your home, in sync</string>
+    <string name="auth_welcome_description">Share products, expiry dates and meal plans with your family.</string>
+    <string name="sign_in">Sign in</string>
+    <string name="registration">Register</string>
+    <string name="create_account">Create account</string>
+    <string name="display_name_label">Your name</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">At least 12 characters</string>
+    <string name="auth_security_note">The connection is encrypted. Session tokens are protected by Android Keystore.</string>
+    <string name="restoring_session">Opening your pantry…</string>
+    <string name="sign_out">Sign out</string>
+    <string name="offline_session">Offline</string>
+    <string name="error_invalid_email">Enter a valid email address</string>
+    <string name="error_empty_password">Enter your password</string>
+    <string name="error_short_password">The password must contain at least 12 characters</string>
+    <string name="error_long_password">The password must contain no more than 128 characters</string>
+    <string name="error_empty_display_name">Enter your name</string>
+    <string name="error_long_display_name">The name must contain no more than 80 characters</string>
+    <string name="error_invalid_credentials">Incorrect email or password</string>
+    <string name="error_email_registered">An account with this email already exists</string>
+    <string name="error_rate_limited">Too many attempts. Please try again later</string>
+    <string name="error_auth_network">Could not reach the server. Check your internet connection</string>
+    <string name="error_auth_server">Something went wrong. Please try again</string>
 </resources>

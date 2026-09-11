@@ -11,10 +11,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import ru.zapasli.app.core.designsystem.theme.ZapasliTheme
+import ru.zapasli.app.ui.auth.AuthViewModel
 import ru.zapasli.app.ui.pantry.PantryViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModels()
     private val pantryViewModel: PantryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +29,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    MainNavigation(pantryViewModel)
+                    ZapasliRoot(
+                        authViewModel = authViewModel,
+                        pantryViewModel = pantryViewModel,
+                    )
                 }
             }
         }

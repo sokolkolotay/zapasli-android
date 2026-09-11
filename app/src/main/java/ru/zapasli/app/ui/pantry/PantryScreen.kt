@@ -84,6 +84,9 @@ import java.util.Locale
 @Composable
 fun PantryRoute(
     viewModel: PantryViewModel,
+    userDisplayName: String,
+    isSessionOffline: Boolean,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -120,6 +123,9 @@ fun PantryRoute(
         onDeleteProduct = { deleteCandidate = it },
         onFilterSelected = viewModel::selectFilter,
         onRetry = viewModel::retry,
+        userDisplayName = userDisplayName,
+        isSessionOffline = isSessionOffline,
+        onLogout = onLogout,
         modifier = modifier,
     )
 
@@ -183,6 +189,9 @@ internal fun PantryScreen(
     onDeleteProduct: (PantryItem) -> Unit,
     onFilterSelected: (PantryFilter) -> Unit,
     onRetry: () -> Unit,
+    userDisplayName: String,
+    isSessionOffline: Boolean,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val addProductDescription = stringResource(R.string.add_product)
@@ -191,7 +200,14 @@ internal fun PantryScreen(
         modifier = modifier
             .fillMaxSize()
             .testTag("pantry_screen"),
-        topBar = { PantryTopBar(state.totalItemCount) },
+        topBar = {
+            PantryTopBar(
+                totalItemCount = state.totalItemCount,
+                userDisplayName = userDisplayName,
+                isSessionOffline = isSessionOffline,
+                onLogout = onLogout,
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (!state.isLoading && !state.loadFailed && state.totalItemCount > 0) {
@@ -227,7 +243,17 @@ internal fun PantryScreen(
 }
 
 @Composable
-private fun PantryTopBar(totalItemCount: Int) {
+private fun PantryTopBar(
+    totalItemCount: Int,
+    userDisplayName: String,
+    isSessionOffline: Boolean,
+    onLogout: () -> Unit,
+) {
+    val itemCount = pluralStringResource(
+        R.plurals.pantry_item_count,
+        totalItemCount,
+        totalItemCount,
+    )
     Surface(
         color = MaterialTheme.colorScheme.background,
         tonalElevation = 1.dp,
@@ -259,14 +285,20 @@ private fun PantryTopBar(totalItemCount: Int) {
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
-                    text = pluralStringResource(
-                        R.plurals.pantry_item_count,
-                        totalItemCount,
-                        totalItemCount,
-                    ),
+                    text = stringResource(R.string.pantry_user_summary, userDisplayName, itemCount),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                if (isSessionOffline) {
+                    Text(
+                        text = stringResource(R.string.offline_session),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+            TextButton(onClick = onLogout) {
+                Text(stringResource(R.string.sign_out))
             }
         }
     }
@@ -754,6 +786,9 @@ private fun EmptyPantryPreview() {
             onDeleteProduct = {},
             onFilterSelected = {},
             onRetry = {},
+            userDisplayName = "Alex",
+            isSessionOffline = false,
+            onLogout = {},
         )
     }
 }
@@ -787,6 +822,9 @@ private fun PantryWithProductPreview() {
             onDeleteProduct = {},
             onFilterSelected = {},
             onRetry = {},
+            userDisplayName = "Alex",
+            isSessionOffline = false,
+            onLogout = {},
         )
     }
 }

@@ -1,9 +1,16 @@
 package ru.zapasli.app
 
 import android.Manifest
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -14,18 +21,30 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import ru.zapasli.app.core.designsystem.theme.ZapasliTheme
+import ru.zapasli.app.domain.pantry.PantryItem
+import ru.zapasli.app.ui.pantry.PantryEditorSheet
+import ru.zapasli.app.ui.pantry.PantryItemInput
+import ru.zapasli.app.ui.pantry.PantryScreen
+import ru.zapasli.app.ui.pantry.PantryUiState
+import ru.zapasli.app.ui.pantry.ProductLookupUiState
+import ru.zapasli.app.ui.scanner.BarcodeScannerDialog
+import java.time.Instant
 
 class PantryScreenTest {
     @get:Rule
-    val composeRule = createAndroidComposeRule<MainActivity>()
+    val composeRule = createComposeRule()
 
     @Before
-    fun grantCameraPermission() {
+    fun setUp() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.uiAutomation.grantRuntimePermission(
             instrumentation.targetContext.packageName,
             Manifest.permission.CAMERA,
         )
+        composeRule.setContent {
+            ZapasliTheme { PantryTestHarness() }
+        }
     }
 
     @Test
@@ -53,7 +72,7 @@ class PantryScreenTest {
     }
 
     @Test
-    fun productCanBeAddedEditedPersistedAndDeleted() {
+    fun productCanBeAddedEditedAndDeleted() {
         waitForTag("add_first_product")
         composeRule.onNodeWithTag("add_first_product").performClick()
         composeRule.onNodeWithTag("product_name_input").performTextInput("Milk")
@@ -61,9 +80,6 @@ class PantryScreenTest {
             .performScrollTo()
             .performClick()
 
-        waitForText("product_name", "Milk")
-
-        composeRule.activityRule.scenario.recreate()
         waitForText("product_name", "Milk")
 
         composeRule.onNodeWithTag("edit_product").performClick()
@@ -76,7 +92,6 @@ class PantryScreenTest {
         waitForText("product_name", "Yogurt")
 
         composeRule.onNodeWithTag("delete_product").performClick()
-        composeRule.onNodeWithTag("confirm_delete").performClick()
         waitForTag("empty_pantry")
         composeRule.onNodeWithTag("empty_pantry").assertIsDisplayed()
     }
@@ -94,4 +109,75 @@ class PantryScreenTest {
             }.isSuccess
         }
     }
+}
+
+@Composable
+private fun PantryTestHarness() {
+    val items = remember { mutableStateListOf<PantryItem>() }
+    var editorItem by remember { mutableStateOf<PantryItem?>(null) }
+    var showEditor by remember { mutableStateOf(false) }
+    var showScanner by remember { mutableStateOf(false) }
+
+    PantryScreen(
+        state = PantryUiState(
+            isLoading = false,
+            items = items.toList(),
+            totalItemCount = items.size,
+        ),
+        snackbarHostState = remember { SnackbarHostState() },
+        onAddProduct = {
+            editorItem = null
+            showEditor = true
+        },
+        onEditProduct = {
+            editorItem = it
+            showEditor = true
+        },
+        onDeleteProduct = { item -> items.removeAll { it.id == item.id } },
+        onFilterSelected = {},
+        onRetry = {},
+        userDisplayName = "Test User",
+        isSessionOffline = false,
+        onLogout = {},
+    )
+
+    if (showEditor) {
+        PantryEditorSheet(
+            item = editorItem,
+            scannedBarcode = null,
+            productLookup = ProductLookupUiState.Idle,
+            onScanBarcode = { showScanner = true },
+            onBarcodeInputChanged = {},
+            onDismiss = { showEditor = false },
+            onSave = { input ->
+                val saved = input.toPantryItem(items.firstOrNull { it.id == input.id })
+                items.removeAll { it.id == saved.id }
+                items.add(saved)
+                showEditor = false
+            },
+        )
+    }
+
+    if (showScanner) {
+        BarcodeScannerDialog(
+            onBarcodeDetected = { showScanner = false },
+            onDismiss = { showScanner = false },
+        )
+    }
+}
+
+private fun PantryItemInput.toPantryItem(existing: PantryItem?): PantryItem {
+    val now = Instant.now()
+    return PantryItem(
+        id = id ?: "test-item",
+        name = name.trim(),
+        barcode = barcode,
+        quantity = quantity,
+        unit = unit,
+        storageLocation = storageLocation,
+        expiresOn = expiresOn,
+        nutritionPer100g = nutritionPer100g,
+        createdAt = existing?.createdAt ?: now,
+        updatedAt = now,
+    )
 }

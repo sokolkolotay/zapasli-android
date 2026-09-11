@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Zapasli</string>
     <string name="pantry_title">Мои запасы</string>
+    <string name="pantry_user_summary">%1$s · %2$s</string>
     <plurals name="pantry_item_count">
         <item quantity="one">%d продукт</item>
         <item quantity="few">%d продукта</item>
@@ -107,4 +108,28 @@
     <string name="error_invalid_quantity">Количество должно быть больше нуля</string>
     <string name="error_invalid_barcode">Штрихкод должен содержать от 8 до 14 цифр</string>
     <string name="error_invalid_nutrition">Значения КБЖУ должны быть неотрицательными числами</string>
+    <string name="auth_welcome_title">Дом, где всё в запасе</string>
+    <string name="auth_welcome_description">Ведите продукты, сроки годности и планы питания вместе с семьёй.</string>
+    <string name="sign_in">Войти</string>
+    <string name="registration">Регистрация</string>
+    <string name="create_account">Создать аккаунт</string>
+    <string name="display_name_label">Ваше имя</string>
+    <string name="email_label">Электронная почта</string>
+    <string name="password_label">Пароль</string>
+    <string name="password_hint">Не менее 12 символов</string>
+    <string name="auth_security_note">Соединение зашифровано. Токены сессии защищены Android Keystore.</string>
+    <string name="restoring_session">Открываем ваши запасы…</string>
+    <string name="sign_out">Выйти</string>
+    <string name="offline_session">Офлайн</string>
+    <string name="error_invalid_email">Введите корректный адрес электронной почты</string>
+    <string name="error_empty_password">Введите пароль</string>
+    <string name="error_short_password">Пароль должен содержать не менее 12 символов</string>
+    <string name="error_long_password">Пароль должен содержать не более 128 символов</string>
+    <string name="error_empty_display_name">Укажите ваше имя</string>
+    <string name="error_long_display_name">Имя должно содержать не более 80 символов</string>
+    <string name="error_invalid_credentials">Неверная почта или пароль</string>
+    <string name="error_email_registered">Аккаунт с такой почтой уже существует</string>
+    <string name="error_rate_limited">Слишком много попыток. Повторите позже</string>
+    <string name="error_auth_network">Сервер недоступен. Проверьте подключение к интернету</string>
+    <string name="error_auth_server">Что-то пошло не так. Попробуйте ещё раз</string>
 </resources>
