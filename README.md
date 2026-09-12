@@ -2,6 +2,10 @@
 
 [![Android CI](https://github.com/sokolkolotay/zapasli-android/actions/workflows/android-ci.yml/badge.svg)](https://github.com/sokolkolotay/zapasli-android/actions/workflows/android-ci.yml)
 
+<p align="center">
+  <img src="docs/branding/zapasli-app-icon.svg" width="112" alt="Иконка Zapasli">
+</p>
+
 Android-приложение для семейного учёта домашних продуктов: сроки годности, места хранения, штрихкоды и КБЖУ.
 
 - Сайт продукта: [zapasli.sokolkolotaj.ru](https://zapasli.sokolkolotaj.ru/)
@@ -109,6 +113,7 @@ CI-эквивалент для Windows:
 - `v0.1.0-offline` — локальная кладовая и offline CRUD;
 - `v0.2.0-barcode` — EAN/UPC и Open Food Facts;
 - `v0.3.0-auth` — production auth, обязательные Settings/Details, RU/EN, единый visual system.
+- `v0.3.1-brand` — фирменная adaptive/monochrome иконка Zapasli.
 
 Теги создаются после локальных проверок, успешного CI и аудита коммита на секреты и локальные файлы.
 
