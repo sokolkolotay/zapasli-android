@@ -132,6 +132,8 @@
     <string name="family_home_title">Дом семьи Колотай</string>
     <string name="settings_title">Настройки</string>
     <string name="settings_short">Настройки</string>
+    <string name="profile_menu_title">Профиль</string>
+    <string name="profile_menu_description">Открыть меню профиля: %1$s</string>
     <string name="back">Назад</string>
     <string name="search_products">Найти продукт</string>
     <string name="products_tracked">продуктов на учёте дома</string>

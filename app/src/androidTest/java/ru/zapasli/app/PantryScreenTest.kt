@@ -1,6 +1,7 @@
 package ru.zapasli.app
 
 import android.Manifest
+import android.os.ParcelFileDescriptor
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,21 +38,52 @@ class PantryScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    private var settingsOpenCount = 0
+    private var logoutCount = 0
+
     @Before
     fun setUp() {
+        settingsOpenCount = 0
+        logoutCount = 0
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.uiAutomation.grantRuntimePermission(
             instrumentation.targetContext.packageName,
             Manifest.permission.CAMERA,
         )
         composeRule.setContent {
-            ZapasliTheme { PantryTestHarness() }
+            ZapasliTheme {
+                PantryTestHarness(
+                    onOpenSettings = { settingsOpenCount += 1 },
+                    onLogout = { logoutCount += 1 },
+                )
+            }
         }
     }
 
     @Test
     fun pantryScreenIsDisplayed() {
         composeRule.onNodeWithTag("pantry_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun profileMenuContainsSettingsAndSignOut() {
+        composeRule.onNodeWithTag("profile_menu_button").performClick()
+
+        composeRule.onNodeWithTag("profile_menu").assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_settings").assertIsDisplayed()
+        composeRule.onNodeWithTag("profile_logout").assertIsDisplayed()
+        captureScreen("zapasli-profile-menu.png")
+    }
+
+    @Test
+    fun profileMenuActionsInvokeTheirCallbacks() {
+        composeRule.onNodeWithTag("profile_menu_button").performClick()
+        composeRule.onNodeWithTag("profile_settings").performClick()
+        composeRule.runOnIdle { assertEquals(1, settingsOpenCount) }
+
+        composeRule.onNodeWithTag("profile_menu_button").performClick()
+        composeRule.onNodeWithTag("profile_logout").performClick()
+        composeRule.runOnIdle { assertEquals(1, logoutCount) }
     }
 
     @Test
@@ -111,10 +144,22 @@ class PantryScreenTest {
             }.isSuccess
         }
     }
+
+    private fun captureScreen(fileName: String) {
+        composeRule.waitForIdle()
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val descriptor = instrumentation.uiAutomation.executeShellCommand(
+            "screencap -p /sdcard/Download/$fileName",
+        )
+        ParcelFileDescriptor.AutoCloseInputStream(descriptor).use { it.readBytes() }
+    }
 }
 
 @Composable
-private fun PantryTestHarness() {
+private fun PantryTestHarness(
+    onOpenSettings: () -> Unit,
+    onLogout: () -> Unit,
+) {
     val items = remember { mutableStateListOf<PantryItem>() }
     var editorItem by remember { mutableStateOf<PantryItem?>(null) }
     var showEditor by remember { mutableStateOf(false) }
@@ -140,6 +185,8 @@ private fun PantryTestHarness() {
         onRetry = {},
         userDisplayName = "Test User",
         isSessionOffline = false,
+        onOpenSettings = onOpenSettings,
+        onLogout = onLogout,
     )
 
     if (showEditor) {

@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" role="img" aria-labelledby="title desc">
   <title id="title">Zapasli</title>
-  <desc id="desc">Фирменный знак: семейный дом и банка домашних запасов со скрытой буквой Z.</desc>
+  <desc id="desc">Фирменный знак: семейный дом и банка домашних запасов с лентой пополнения между полками.</desc>
   <rect width="108" height="108" rx="24" fill="#0B211A"/>
   <path d="M70 32V24c0-3.3 2.7-6 6-6h2c3.3 0 6 2.7 6 6v16Z" fill="#C8F36B"/>
   <path d="m25 40 29-18 29 18" fill="none" stroke="#C8F36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
   <rect x="30" y="43" width="48" height="12" rx="6" fill="#FFFDF6"/>
   <path d="M36 57h36c6.6 0 12 5.4 12 12v11c0 7.7-6.3 14-14 14H38c-7.7 0-14-6.3-14-14V69c0-6.6 5.4-12 12-12Z" fill="#FFFDF6"/>
   <path d="M39 63h30c5 0 9 4 9 9v8c0 4.4-3.6 8-8 8H38c-4.4 0-8-3.6-8-8v-8c0-5 4-9 9-9Z" fill="#7BE1BB"/>
-  <path d="M38 69h31L39 84h31" fill="none" stroke="#0B211A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M35 69c5-1.5 10-1.5 15 0" fill="none" stroke="#0B211A" stroke-width="6" stroke-linecap="round"/>
+  <path d="M38 83c6-8 13-8 20-11 6-2.5 10-6.5 14-9" fill="none" stroke="#0B211A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M59 83.5c5 1.5 9 1.5 13-.5" fill="none" stroke="#0B211A" stroke-width="6" stroke-linecap="round"/>
   <circle cx="74" cy="54" r="5" fill="#FF6D50"/>
 </svg>

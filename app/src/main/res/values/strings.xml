@@ -124,6 +124,8 @@
     <string name="family_home_title">Kolotay family home</string>
     <string name="settings_title">Settings</string>
     <string name="settings_short">Settings</string>
+    <string name="profile_menu_title">Account</string>
+    <string name="profile_menu_description">Open account menu for %1$s</string>
     <string name="back">Back</string>
     <string name="search_products">Search products</string>
     <string name="products_tracked">products tracked at home</string>

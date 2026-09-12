@@ -27,14 +27,28 @@
         android:fillColor="#7BE1BB"
         android:pathData="M39,63 L69,63 C74,63 78,67 78,72 L78,80 C78,84.4 74.4,88 70,88 L38,88 C33.6,88 30,84.4 30,80 L30,72 C30,67 34,63 39,63 Z" />
 
-    <!-- The negative-space Z makes the utility mark recognisably Zapasli. -->
+    <!-- Pantry shelves joined by a replenishment ribbon: a subtle echo of the brand initial. -->
     <path
         android:fillColor="#00000000"
-        android:pathData="M38,69 L69,69 L39,84 L70,84"
+        android:pathData="M35,69 C40,67.5 45,67.5 50,69"
+        android:strokeColor="#0B211A"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="6" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M38,83 C44,75 51,75 58,72 C64,69.5 68,65.5 72,63"
         android:strokeColor="#0B211A"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:strokeWidth="7" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,83.5 C64,85 68,85 72,83"
+        android:strokeColor="#0B211A"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="6" />
 
     <!-- Freshness / expiry status accent. -->
     <path

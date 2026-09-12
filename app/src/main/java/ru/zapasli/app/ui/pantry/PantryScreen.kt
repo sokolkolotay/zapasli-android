@@ -24,6 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -92,6 +94,7 @@ fun PantryRoute(
     userDisplayName: String,
     isSessionOffline: Boolean,
     onOpenSettings: () -> Unit,
+    onLogout: () -> Unit,
     onProductSelected: (PantryItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,6 +137,7 @@ fun PantryRoute(
         userDisplayName = userDisplayName,
         isSessionOffline = isSessionOffline,
         onOpenSettings = onOpenSettings,
+        onLogout = onLogout,
         modifier = modifier,
     )
 
@@ -203,6 +207,7 @@ internal fun PantryScreen(
     onSearchQueryChanged: (String) -> Unit = {},
     onProductClick: (PantryItem) -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    onLogout: () -> Unit = {},
 ) {
     val addProductDescription = stringResource(R.string.add_product)
 
@@ -216,6 +221,7 @@ internal fun PantryScreen(
                 userDisplayName = userDisplayName,
                 isSessionOffline = isSessionOffline,
                 onOpenSettings = onOpenSettings,
+                onLogout = onLogout,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -223,7 +229,6 @@ internal fun PantryScreen(
             PantryBottomBar(
                 addProductDescription = addProductDescription,
                 onAddProduct = onAddProduct,
-                onOpenSettings = onOpenSettings,
             )
         },
     ) { contentPadding ->
@@ -250,7 +255,15 @@ private fun PantryTopBar(
     userDisplayName: String,
     isSessionOffline: Boolean,
     onOpenSettings: () -> Unit,
+    onLogout: () -> Unit,
 ) {
+    var profileMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    val appName = stringResource(R.string.app_name)
+    val normalizedDisplayName = userDisplayName.trim().ifBlank { appName }
+    val profileMenuDescription = stringResource(
+        R.string.profile_menu_description,
+        normalizedDisplayName,
+    )
     val itemCount = pluralStringResource(
         R.plurals.pantry_item_count,
         totalItemCount,
@@ -286,30 +299,74 @@ private fun PantryTopBar(
                     )
                 }
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Surface(
-                    shape = CircleShape,
-                    color = ZapasliLime,
-                    contentColor = ZapasliInk,
-                ) {
+            Box {
+                Column(horizontalAlignment = Alignment.End) {
+                    Surface(
+                        onClick = { profileMenuExpanded = true },
+                        modifier = Modifier
+                            .testTag("profile_menu_button")
+                            .semantics { contentDescription = profileMenuDescription },
+                        shape = CircleShape,
+                        color = ZapasliLime,
+                        contentColor = ZapasliInk,
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                            text = normalizedDisplayName.take(2).uppercase(),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                     Text(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                        text = userDisplayName.trim().take(2).uppercase().ifBlank { "Z" },
-                        fontWeight = FontWeight.Bold,
+                        text = itemCount,
+                        color = ZapasliPaper.copy(alpha = 0.72f),
+                        style = MaterialTheme.typography.labelMedium,
                     )
                 }
-                Text(
-                    text = itemCount,
-                    color = ZapasliPaper.copy(alpha = 0.72f),
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
-            Spacer(modifier = Modifier.width(ZapasliSpacing.xs))
-            TextButton(
-                modifier = Modifier.testTag("open_settings"),
-                onClick = onOpenSettings,
-            ) {
-                Text(stringResource(R.string.settings_short), color = ZapasliLime)
+                DropdownMenu(
+                    expanded = profileMenuExpanded,
+                    onDismissRequest = { profileMenuExpanded = false },
+                    modifier = Modifier.testTag("profile_menu"),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(
+                            horizontal = ZapasliSpacing.md,
+                            vertical = ZapasliSpacing.sm,
+                        ),
+                    ) {
+                        Text(
+                            text = normalizedDisplayName,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = stringResource(R.string.profile_menu_title),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        modifier = Modifier.testTag("profile_settings"),
+                        text = { Text(stringResource(R.string.settings_title)) },
+                        onClick = {
+                            profileMenuExpanded = false
+                            onOpenSettings()
+                        },
+                    )
+                    DropdownMenuItem(
+                        modifier = Modifier.testTag("profile_logout"),
+                        text = {
+                            Text(
+                                text = stringResource(R.string.sign_out),
+                                color = ZapasliCoral,
+                            )
+                        },
+                        onClick = {
+                            profileMenuExpanded = false
+                            onLogout()
+                        },
+                    )
+                }
             }
         }
     }
@@ -319,29 +376,31 @@ private fun PantryTopBar(
 private fun PantryBottomBar(
     addProductDescription: String,
     onAddProduct: () -> Unit,
-    onOpenSettings: () -> Unit,
 ) {
     Surface(
         color = ZapasliInk,
         contentColor = ZapasliPaper,
         shadowElevation = 12.dp,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(
-                horizontal = ZapasliSpacing.lg,
-                vertical = ZapasliSpacing.sm,
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = ZapasliSpacing.lg,
+                    vertical = ZapasliSpacing.sm,
+                ),
         ) {
             Text(
+                modifier = Modifier.align(Alignment.CenterStart),
                 text = stringResource(R.string.pantry_title),
                 color = ZapasliLime,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.labelLarge,
             )
             FloatingActionButton(
-                modifier = Modifier.testTag("add_product_fab")
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .testTag("add_product_fab")
                     .semantics { contentDescription = addProductDescription },
                 onClick = onAddProduct,
                 shape = CircleShape,
@@ -349,9 +408,6 @@ private fun PantryBottomBar(
                 contentColor = ZapasliInk,
             ) {
                 Text("+", style = MaterialTheme.typography.headlineSmall)
-            }
-            TextButton(onClick = onOpenSettings) {
-                Text(stringResource(R.string.settings_short), color = ZapasliPaper)
             }
         }
     }

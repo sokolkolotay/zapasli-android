@@ -64,6 +64,7 @@ private fun MainNavigation(
                     userDisplayName = userDisplayName,
                     isSessionOffline = isSessionOffline,
                     onOpenSettings = { backStack.add(Settings) },
+                    onLogout = onLogout,
                     onProductSelected = { item ->
                         backStack.add(ProductDetails(item.id))
                     },
