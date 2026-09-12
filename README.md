@@ -114,6 +114,7 @@ CI-эквивалент для Windows:
 - `v0.2.0-barcode` — EAN/UPC и Open Food Facts;
 - `v0.3.0-auth` — production auth, обязательные Settings/Details, RU/EN, единый visual system.
 - `v0.3.1-brand` — фирменная adaptive/monochrome иконка Zapasli.
+- `v0.3.2` — обновлённый знак Zapasli и меню профиля с настройками и выходом.
 
 Теги создаются после локальных проверок, успешного CI и аудита коммита на секреты и локальные файлы.
 
