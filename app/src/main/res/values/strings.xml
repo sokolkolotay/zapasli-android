@@ -2,18 +2,15 @@
 <resources>
     <string name="app_name">Zapasli</string>
     <string name="pantry_title">My pantry</string>
-    <string name="pantry_user_summary">%1$s · %2$s</string>
     <plurals name="pantry_item_count">
         <item quantity="one">%d product</item>
         <item quantity="other">%d products</item>
     </plurals>
-    <string name="attention_title">Needs attention</string>
     <plurals name="attention_item_count">
         <item quantity="one">Use %d product soon</item>
         <item quantity="other">Use %d products soon</item>
     </plurals>
     <string name="everything_fresh_title">Everything is fresh</string>
-    <string name="everything_fresh_description">No urgent products right now</string>
     <string name="filter_all">All</string>
     <string name="filter_expiring_soon">Expiring soon</string>
     <string name="filter_expired">Expired</string>
@@ -124,4 +121,39 @@
     <string name="error_rate_limited">Too many attempts. Please try again later</string>
     <string name="error_auth_network">Could not reach the server. Check your internet connection</string>
     <string name="error_auth_server">Something went wrong. Please try again</string>
+    <string name="family_home_title">Kolotay family home</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_short">Settings</string>
+    <string name="back">Back</string>
+    <string name="search_products">Search products</string>
+    <string name="products_tracked">products tracked at home</string>
+    <string name="settings_theme_title">Appearance</string>
+    <string name="settings_theme_description">Choose how Zapasli looks on this device.</string>
+    <string name="theme_system">System theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_description">Use the system language or choose English or Russian.</string>
+    <string name="language_system">System language</string>
+    <string name="language_english">English</string>
+    <string name="language_russian">Russian</string>
+    <string name="settings_filter_title">Default pantry filter</string>
+    <string name="settings_filter_description">This filter is applied when you open your pantry.</string>
+    <string name="settings_about_title">About Zapasli</string>
+    <string name="settings_about_description">A family product tracker with expiry dates, barcodes and nutrition data. Connected to the Zapasli API over HTTPS.</string>
+    <string name="product_details_title">Product details</string>
+    <string name="product_not_found">This product is no longer in the pantry.</string>
+    <string name="product_details_storage">Storage and expiry</string>
+    <string name="product_details_identification">Product information</string>
+    <string name="product_details_updated">Updated</string>
+    <string name="product_details_no_nutrition">Nutrition data is not specified</string>
+    <string name="product_details_not_specified">Not specified</string>
+    <plurals name="product_details_expired">
+        <item quantity="one">Expired %d day ago</item>
+        <item quantity="other">Expired %d days ago</item>
+    </plurals>
+    <plurals name="product_details_days_left">
+        <item quantity="one">%d day left</item>
+        <item quantity="other">%d days left</item>
+    </plurals>
 </resources>

@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -25,17 +27,30 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
+import ru.zapasli.app.core.preferences.PantryFilterPreference
+import ru.zapasli.app.core.preferences.UserPreferencesRepository
 
 @HiltViewModel
 class PantryViewModel @Inject constructor(
     private val pantryRepository: PantryRepository,
     private val productCatalogRepository: ProductCatalogRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
     private val selectedFilter = MutableStateFlow(PantryFilter.ALL)
+    private val searchQuery = MutableStateFlow("")
     private val message = MutableStateFlow<PantryMessage?>(null)
     private val retrySignal = MutableStateFlow(0)
     private val productLookup = MutableStateFlow<ProductLookupUiState>(ProductLookupUiState.Idle)
     private var lookupJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            userPreferencesRepository.userPreferences
+                .map { it.defaultPantryFilter }
+                .distinctUntilChanged()
+                .collectLatest { selectedFilter.value = it.toUiFilter() }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val itemsResult: Flow<ItemsResult> = retrySignal.flatMapLatest {
@@ -48,19 +63,22 @@ class PantryViewModel @Inject constructor(
     val uiState = combine(
         itemsResult,
         selectedFilter,
+        searchQuery,
         message,
         productLookup,
-    ) { result, filter, currentMessage, currentProductLookup ->
+    ) { result, filter, query, currentMessage, currentProductLookup ->
         when (result) {
             ItemsResult.Loading -> PantryUiState(
                 isLoading = true,
                 selectedFilter = filter,
+                searchQuery = query,
                 message = currentMessage,
                 productLookup = currentProductLookup,
             )
             ItemsResult.Error -> PantryUiState(
                 isLoading = false,
                 selectedFilter = filter,
+                searchQuery = query,
                 loadFailed = true,
                 message = currentMessage,
                 productLookup = currentProductLookup,
@@ -69,8 +87,13 @@ class PantryViewModel @Inject constructor(
                 val today = LocalDate.now()
                 PantryUiState(
                     isLoading = false,
-                    items = filterPantryItems(result.items, filter, today),
+                    items = searchPantryItems(
+                        filterPantryItems(result.items, filter, today),
+                        query,
+                    ),
+                    allItems = result.items,
                     selectedFilter = filter,
+                    searchQuery = query,
                     totalItemCount = result.items.size,
                     attentionItemCount = result.items.attentionCount(today),
                     message = currentMessage,
@@ -86,6 +109,13 @@ class PantryViewModel @Inject constructor(
 
     fun selectFilter(filter: PantryFilter) {
         selectedFilter.value = filter
+        viewModelScope.launch {
+            userPreferencesRepository.setDefaultPantryFilter(filter.toPreference())
+        }
+    }
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
     }
 
     fun retry() {
@@ -172,4 +202,18 @@ class PantryViewModel @Inject constructor(
         data object Error : ItemsResult
         data class Content(val items: List<PantryItem>) : ItemsResult
     }
+}
+
+private fun PantryFilterPreference.toUiFilter(): PantryFilter = when (this) {
+    PantryFilterPreference.ALL -> PantryFilter.ALL
+    PantryFilterPreference.EXPIRING_SOON -> PantryFilter.EXPIRING_SOON
+    PantryFilterPreference.EXPIRED -> PantryFilter.EXPIRED
+    PantryFilterPreference.NO_DATE -> PantryFilter.NO_DATE
+}
+
+private fun PantryFilter.toPreference(): PantryFilterPreference = when (this) {
+    PantryFilter.ALL -> PantryFilterPreference.ALL
+    PantryFilter.EXPIRING_SOON -> PantryFilterPreference.EXPIRING_SOON
+    PantryFilter.EXPIRED -> PantryFilterPreference.EXPIRED
+    PantryFilter.NO_DATE -> PantryFilterPreference.NO_DATE
 }

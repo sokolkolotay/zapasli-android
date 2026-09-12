@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import ru.zapasli.app.R
 import ru.zapasli.app.core.designsystem.theme.ZapasliSpacing
 import ru.zapasli.app.core.designsystem.theme.ZapasliTheme
+import ru.zapasli.app.core.designsystem.theme.ZapasliInk
+import ru.zapasli.app.core.designsystem.theme.ZapasliLime
 import ru.zapasli.app.domain.auth.AuthFailure
 
 @Composable
@@ -66,12 +68,12 @@ fun AuthScreen(
             Surface(
                 modifier = Modifier.size(72.dp),
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primary,
+                color = ZapasliLime,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = "Z",
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = ZapasliInk,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.displaySmall,
                     )

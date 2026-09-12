@@ -15,8 +15,12 @@
 !.env.example
 *.jks
 *.keystore
+*.key
 *.p12
+*.pfx
 *.pem
+id_rsa*
+id_ed25519*
 keystore.properties
 secrets.properties
 **/google-services.json

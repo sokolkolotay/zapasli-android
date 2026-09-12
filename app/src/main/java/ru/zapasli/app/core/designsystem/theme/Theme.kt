@@ -7,24 +7,24 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val LightColors = lightColorScheme(
-    primary = Green700,
-    onPrimary = Cream0,
-    primaryContainer = Green100,
-    onPrimaryContainer = Green900,
-    secondary = Orange500,
-    onSecondary = Cream0,
-    secondaryContainer = Orange100,
-    onSecondaryContainer = Ink900,
-    tertiary = Blue500,
-    onTertiary = Cream0,
-    tertiaryContainer = Blue50,
-    onTertiaryContainer = Ink900,
-    background = Cream50,
-    onBackground = Ink900,
-    surface = Cream0,
-    onSurface = Ink900,
+    primary = ZapasliInk,
+    onPrimary = ZapasliPaper,
+    primaryContainer = ZapasliLime,
+    onPrimaryContainer = ZapasliInk,
+    secondary = ZapasliCoral,
+    onSecondary = ZapasliInk,
+    secondaryContainer = ColorTokens.lightCoralContainer,
+    onSecondaryContainer = ZapasliInk,
+    tertiary = ZapasliMint,
+    onTertiary = ZapasliInk,
+    tertiaryContainer = ColorTokens.lightMintContainer,
+    onTertiaryContainer = ZapasliInk,
+    background = ZapasliCream,
+    onBackground = ZapasliInk,
+    surface = ZapasliPaper,
+    onSurface = ZapasliInk,
     surfaceVariant = Cream100,
-    onSurfaceVariant = Ink700,
+    onSurfaceVariant = ZapasliInkSoft,
     outline = Ink300,
     outlineVariant = Ink150,
     error = Red500,
@@ -34,18 +34,18 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Green300,
-    onPrimary = Green900,
-    primaryContainer = Green800,
-    onPrimaryContainer = Green100,
-    secondary = Orange300,
-    onSecondary = Ink900,
-    secondaryContainer = ColorTokens.darkOrangeContainer,
-    onSecondaryContainer = Orange100,
-    tertiary = ColorTokens.darkBlue,
-    onTertiary = Ink900,
-    tertiaryContainer = ColorTokens.darkBlueContainer,
-    onTertiaryContainer = Blue50,
+    primary = ZapasliLime,
+    onPrimary = ZapasliInk,
+    primaryContainer = ColorTokens.darkLimeContainer,
+    onPrimaryContainer = ZapasliLime,
+    secondary = ZapasliCoral,
+    onSecondary = ZapasliInk,
+    secondaryContainer = ColorTokens.darkCoralContainer,
+    onSecondaryContainer = ZapasliPaper,
+    tertiary = ZapasliMint,
+    onTertiary = ZapasliInk,
+    tertiaryContainer = ColorTokens.darkMintContainer,
+    onTertiaryContainer = ZapasliMint,
     background = DarkBackground,
     onBackground = Ink100,
     surface = DarkSurface,
@@ -61,9 +61,11 @@ private val DarkColors = darkColorScheme(
 )
 
 private object ColorTokens {
-    val darkOrangeContainer = androidx.compose.ui.graphics.Color(0xFF5A3217)
-    val darkBlue = androidx.compose.ui.graphics.Color(0xFF9DBBFF)
-    val darkBlueContainer = androidx.compose.ui.graphics.Color(0xFF183663)
+    val lightCoralContainer = androidx.compose.ui.graphics.Color(0xFFFFDAD2)
+    val lightMintContainer = androidx.compose.ui.graphics.Color(0xFFD3F7E9)
+    val darkLimeContainer = androidx.compose.ui.graphics.Color(0xFF405628)
+    val darkCoralContainer = androidx.compose.ui.graphics.Color(0xFF6B281D)
+    val darkMintContainer = androidx.compose.ui.graphics.Color(0xFF174C3D)
     val darkRed = androidx.compose.ui.graphics.Color(0xFFFFB4AB)
     val darkRedContainer = androidx.compose.ui.graphics.Color(0xFF6E201A)
 }

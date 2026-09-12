@@ -29,6 +29,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -45,7 +46,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -67,6 +67,11 @@ import ru.zapasli.app.core.designsystem.theme.Yellow50
 import ru.zapasli.app.core.designsystem.theme.Yellow500
 import ru.zapasli.app.core.designsystem.theme.ZapasliSpacing
 import ru.zapasli.app.core.designsystem.theme.ZapasliTheme
+import ru.zapasli.app.core.designsystem.theme.ZapasliCoral
+import ru.zapasli.app.core.designsystem.theme.ZapasliInk
+import ru.zapasli.app.core.designsystem.theme.ZapasliLime
+import ru.zapasli.app.core.designsystem.theme.ZapasliMint
+import ru.zapasli.app.core.designsystem.theme.ZapasliPaper
 import ru.zapasli.app.core.model.ExpiryState
 import ru.zapasli.app.domain.pantry.NutritionPer100g
 import ru.zapasli.app.domain.pantry.PantryItem
@@ -86,7 +91,8 @@ fun PantryRoute(
     viewModel: PantryViewModel,
     userDisplayName: String,
     isSessionOffline: Boolean,
-    onLogout: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onProductSelected: (PantryItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -122,10 +128,12 @@ fun PantryRoute(
         },
         onDeleteProduct = { deleteCandidate = it },
         onFilterSelected = viewModel::selectFilter,
+        onSearchQueryChanged = viewModel::setSearchQuery,
+        onProductClick = onProductSelected,
         onRetry = viewModel::retry,
         userDisplayName = userDisplayName,
         isSessionOffline = isSessionOffline,
-        onLogout = onLogout,
+        onOpenSettings = onOpenSettings,
         modifier = modifier,
     )
 
@@ -191,8 +199,10 @@ internal fun PantryScreen(
     onRetry: () -> Unit,
     userDisplayName: String,
     isSessionOffline: Boolean,
-    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
+    onSearchQueryChanged: (String) -> Unit = {},
+    onProductClick: (PantryItem) -> Unit = {},
+    onOpenSettings: () -> Unit = {},
 ) {
     val addProductDescription = stringResource(R.string.add_product)
 
@@ -205,26 +215,16 @@ internal fun PantryScreen(
                 totalItemCount = state.totalItemCount,
                 userDisplayName = userDisplayName,
                 isSessionOffline = isSessionOffline,
-                onLogout = onLogout,
+                onOpenSettings = onOpenSettings,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            if (!state.isLoading && !state.loadFailed && state.totalItemCount > 0) {
-                FloatingActionButton(
-                    modifier = Modifier
-                        .testTag("add_product_fab")
-                        .semantics { contentDescription = addProductDescription },
-                    onClick = onAddProduct,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ) {
-                    Text(
-                        text = "+",
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                }
-            }
+        bottomBar = {
+            PantryBottomBar(
+                addProductDescription = addProductDescription,
+                onAddProduct = onAddProduct,
+                onOpenSettings = onOpenSettings,
+            )
         },
     ) { contentPadding ->
         when {
@@ -237,6 +237,8 @@ internal fun PantryScreen(
                 onEditProduct = onEditProduct,
                 onDeleteProduct = onDeleteProduct,
                 onFilterSelected = onFilterSelected,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onProductClick = onProductClick,
             )
         }
     }
@@ -247,7 +249,7 @@ private fun PantryTopBar(
     totalItemCount: Int,
     userDisplayName: String,
     isSessionOffline: Boolean,
-    onLogout: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val itemCount = pluralStringResource(
         R.plurals.pantry_item_count,
@@ -255,8 +257,8 @@ private fun PantryTopBar(
         totalItemCount,
     )
     Surface(
-        color = MaterialTheme.colorScheme.background,
-        tonalElevation = 1.dp,
+        color = ZapasliInk,
+        contentColor = ZapasliPaper,
     ) {
         Row(
             modifier = Modifier
@@ -265,40 +267,91 @@ private fun PantryTopBar(
                 .padding(horizontal = ZapasliSpacing.md, vertical = ZapasliSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                modifier = Modifier.size(44.dp),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.primary,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Z",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(ZapasliSpacing.sm))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.pantry_title),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = stringResource(R.string.family_home_title),
+                    color = ZapasliMint,
+                    style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    text = stringResource(R.string.pantry_user_summary, userDisplayName, itemCount),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.pantry_title),
+                    color = ZapasliPaper,
+                    style = MaterialTheme.typography.headlineSmall,
                 )
                 if (isSessionOffline) {
                     Text(
                         text = stringResource(R.string.offline_session),
-                        color = MaterialTheme.colorScheme.secondary,
+                        color = ZapasliCoral,
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }
-            TextButton(onClick = onLogout) {
-                Text(stringResource(R.string.sign_out))
+            Column(horizontalAlignment = Alignment.End) {
+                Surface(
+                    shape = CircleShape,
+                    color = ZapasliLime,
+                    contentColor = ZapasliInk,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        text = userDisplayName.trim().take(2).uppercase().ifBlank { "Z" },
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Text(
+                    text = itemCount,
+                    color = ZapasliPaper.copy(alpha = 0.72f),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+            Spacer(modifier = Modifier.width(ZapasliSpacing.xs))
+            TextButton(
+                modifier = Modifier.testTag("open_settings"),
+                onClick = onOpenSettings,
+            ) {
+                Text(stringResource(R.string.settings_short), color = ZapasliLime)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PantryBottomBar(
+    addProductDescription: String,
+    onAddProduct: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    Surface(
+        color = ZapasliInk,
+        contentColor = ZapasliPaper,
+        shadowElevation = 12.dp,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(
+                horizontal = ZapasliSpacing.lg,
+                vertical = ZapasliSpacing.sm,
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = stringResource(R.string.pantry_title),
+                color = ZapasliLime,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.labelLarge,
+            )
+            FloatingActionButton(
+                modifier = Modifier.testTag("add_product_fab")
+                    .semantics { contentDescription = addProductDescription },
+                onClick = onAddProduct,
+                shape = CircleShape,
+                containerColor = ZapasliLime,
+                contentColor = ZapasliInk,
+            ) {
+                Text("+", style = MaterialTheme.typography.headlineSmall)
+            }
+            TextButton(onClick = onOpenSettings) {
+                Text(stringResource(R.string.settings_short), color = ZapasliPaper)
             }
         }
     }
@@ -312,6 +365,8 @@ private fun PantryContent(
     onEditProduct: (PantryItem) -> Unit,
     onDeleteProduct: (PantryItem) -> Unit,
     onFilterSelected: (PantryFilter) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onProductClick: (PantryItem) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -321,7 +376,7 @@ private fun PantryContent(
             start = ZapasliSpacing.md,
             top = contentPadding.calculateTopPadding() + ZapasliSpacing.md,
             end = ZapasliSpacing.md,
-            bottom = contentPadding.calculateBottomPadding() + 96.dp,
+            bottom = contentPadding.calculateBottomPadding() + ZapasliSpacing.md,
         ),
         verticalArrangement = Arrangement.spacedBy(ZapasliSpacing.md),
     ) {
@@ -333,7 +388,20 @@ private fun PantryContent(
         }
 
         item {
-            AttentionSummary(state.attentionItemCount)
+            AttentionSummary(
+                totalItemCount = state.totalItemCount,
+                attentionItemCount = state.attentionItemCount,
+            )
+        }
+        item {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth().testTag("pantry_search"),
+                value = state.searchQuery,
+                onValueChange = onSearchQueryChanged,
+                label = { Text(stringResource(R.string.search_products)) },
+                singleLine = true,
+                shape = MaterialTheme.shapes.large,
+            )
         }
         item {
             PantryFilters(
@@ -353,6 +421,7 @@ private fun PantryContent(
                     item = item,
                     onEdit = { onEditProduct(item) },
                     onDelete = { onDeleteProduct(item) },
+                    onOpenDetails = { onProductClick(item) },
                 )
             }
         }
@@ -360,16 +429,12 @@ private fun PantryContent(
 }
 
 @Composable
-private fun AttentionSummary(attentionItemCount: Int) {
+private fun AttentionSummary(totalItemCount: Int, attentionItemCount: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = if (attentionItemCount > 0) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
-                MaterialTheme.colorScheme.primaryContainer
-            },
+            containerColor = ZapasliLime,
         ),
     ) {
         Row(
@@ -377,30 +442,25 @@ private fun AttentionSummary(attentionItemCount: Int) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(ZapasliSpacing.md),
         ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                color = if (attentionItemCount > 0) Orange500 else Green700,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = if (attentionItemCount > 0) attentionItemCount.toString() else "✓",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-            }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (attentionItemCount > 0) {
-                        stringResource(R.string.attention_title)
-                    } else {
-                        stringResource(R.string.everything_fresh_title)
-                    },
-                    style = MaterialTheme.typography.titleMedium,
+                    text = totalItemCount.toString(),
+                    color = ZapasliInk,
+                    style = MaterialTheme.typography.displaySmall,
                 )
                 Text(
+                    text = stringResource(R.string.products_tracked),
+                    color = ZapasliInk,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = if (attentionItemCount > 0) ZapasliCoral else ZapasliInk,
+                contentColor = if (attentionItemCount > 0) ZapasliInk else ZapasliLime,
+            ) {
+                Text(
+                    modifier = Modifier.padding(ZapasliSpacing.sm),
                     text = if (attentionItemCount > 0) {
                         pluralStringResource(
                             R.plurals.attention_item_count,
@@ -408,10 +468,9 @@ private fun AttentionSummary(attentionItemCount: Int) {
                             attentionItemCount,
                         )
                     } else {
-                        stringResource(R.string.everything_fresh_description)
+                        stringResource(R.string.everything_fresh_title)
                     },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
@@ -444,8 +503,10 @@ private fun PantryProductCard(
     item: PantryItem,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onOpenDetails: () -> Unit,
 ) {
     ElevatedCard(
+        onClick = onOpenDetails,
         modifier = Modifier
             .fillMaxWidth()
             .testTag("product_card_${item.id}"),
@@ -460,12 +521,12 @@ private fun PantryProductCard(
                     modifier = Modifier
                         .size(52.dp)
                         .clip(MaterialTheme.shapes.medium)
-                        .background(Green50),
+                        .background(ZapasliMint),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = item.name.firstOrNull()?.uppercase() ?: "?",
-                        color = Green700,
+                        color = ZapasliInk,
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
@@ -788,7 +849,6 @@ private fun EmptyPantryPreview() {
             onRetry = {},
             userDisplayName = "Alex",
             isSessionOffline = false,
-            onLogout = {},
         )
     }
 }
@@ -824,7 +884,6 @@ private fun PantryWithProductPreview() {
             onRetry = {},
             userDisplayName = "Alex",
             isSessionOffline = false,
-            onLogout = {},
         )
     }
 }

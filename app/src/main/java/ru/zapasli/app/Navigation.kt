@@ -11,11 +11,15 @@ import ru.zapasli.app.ui.auth.AuthScreen
 import ru.zapasli.app.ui.auth.AuthViewModel
 import ru.zapasli.app.ui.pantry.PantryRoute
 import ru.zapasli.app.ui.pantry.PantryViewModel
+import ru.zapasli.app.ui.details.ProductDetailsRoute
+import ru.zapasli.app.ui.settings.SettingsRoute
+import ru.zapasli.app.ui.settings.SettingsViewModel
 
 @Composable
 fun ZapasliRoot(
     authViewModel: AuthViewModel,
     pantryViewModel: PantryViewModel,
+    settingsViewModel: SettingsViewModel,
 ) {
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
     val session = authState.session
@@ -32,6 +36,7 @@ fun ZapasliRoot(
         )
         else -> MainNavigation(
             pantryViewModel = pantryViewModel,
+            settingsViewModel = settingsViewModel,
             userDisplayName = session.user.displayName,
             isSessionOffline = authState.isOfflineSession,
             onLogout = authViewModel::logout,
@@ -42,6 +47,7 @@ fun ZapasliRoot(
 @Composable
 private fun MainNavigation(
     pantryViewModel: PantryViewModel,
+    settingsViewModel: SettingsViewModel,
     userDisplayName: String,
     isSessionOffline: Boolean,
     onLogout: () -> Unit,
@@ -57,7 +63,25 @@ private fun MainNavigation(
                     viewModel = pantryViewModel,
                     userDisplayName = userDisplayName,
                     isSessionOffline = isSessionOffline,
+                    onOpenSettings = { backStack.add(Settings) },
+                    onProductSelected = { item ->
+                        backStack.add(ProductDetails(item.id))
+                    },
+                )
+            }
+            entry<Settings> {
+                SettingsRoute(
+                    viewModel = settingsViewModel,
+                    userDisplayName = userDisplayName,
+                    onBack = { backStack.removeLastOrNull() },
                     onLogout = onLogout,
+                )
+            }
+            entry<ProductDetails> { destination ->
+                ProductDetailsRoute(
+                    viewModel = pantryViewModel,
+                    itemId = destination.itemId,
+                    onBack = { backStack.removeLastOrNull() },
                 )
             }
         },

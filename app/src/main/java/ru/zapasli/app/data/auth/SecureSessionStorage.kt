@@ -1,5 +1,6 @@
 package ru.zapasli.app.data.auth
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -55,6 +56,7 @@ internal class SecureSessionStorage @Inject constructor(
     }
 
     @Synchronized
+    @SuppressLint("UseKtx") // commit() result is intentionally verified before returning.
     override fun write(session: AuthSession) {
         val cipher = Cipher.getInstance(TRANSFORMATION).apply {
             init(Cipher.ENCRYPT_MODE, getOrCreateKey())
@@ -70,6 +72,7 @@ internal class SecureSessionStorage @Inject constructor(
     }
 
     @Synchronized
+    @SuppressLint("UseKtx") // apply() is intentional for best-effort removal during recovery.
     override fun clear() {
         preferences.edit().remove(SESSION_KEY).apply()
     }

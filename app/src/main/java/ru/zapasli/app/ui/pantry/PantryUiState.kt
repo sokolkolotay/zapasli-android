@@ -13,7 +13,9 @@ import java.time.temporal.ChronoUnit
 data class PantryUiState(
     val isLoading: Boolean = true,
     val items: List<PantryItem> = emptyList(),
+    val allItems: List<PantryItem> = emptyList(),
     val selectedFilter: PantryFilter = PantryFilter.ALL,
+    val searchQuery: String = "",
     val totalItemCount: Int = 0,
     val attentionItemCount: Int = 0,
     val loadFailed: Boolean = false,
@@ -85,6 +87,18 @@ internal fun filterPantryItems(
         PantryFilter.EXPIRING_SOON -> state == ExpiryState.Today || state == ExpiryState.Soon
         PantryFilter.EXPIRED -> state == ExpiryState.Expired
         PantryFilter.NO_DATE -> state == ExpiryState.NoDate
+    }
+}
+
+internal fun searchPantryItems(
+    items: List<PantryItem>,
+    query: String,
+): List<PantryItem> {
+    val normalizedQuery = query.trim()
+    if (normalizedQuery.isEmpty()) return items
+    return items.filter { item ->
+        item.name.contains(normalizedQuery, ignoreCase = true) ||
+            item.barcode?.contains(normalizedQuery) == true
     }
 }
 

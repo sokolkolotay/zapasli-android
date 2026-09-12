@@ -2,6 +2,15 @@ package ru.zapasli.app.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
+// Shared product palette. These exact tokens are also used by zapasli.sokolkolotaj.ru.
+val ZapasliInk = Color(0xFF0B211A)
+val ZapasliInkSoft = Color(0xFF17342B)
+val ZapasliCream = Color(0xFFF5F0E4)
+val ZapasliPaper = Color(0xFFFFFDF6)
+val ZapasliLime = Color(0xFFC8F36B)
+val ZapasliMint = Color(0xFF7BE1BB)
+val ZapasliCoral = Color(0xFFFF6D50)
+
 val Green50 = Color(0xFFEDF8F0)
 val Green100 = Color(0xFFD9F0E0)
 val Green200 = Color(0xFFB6E0C3)
@@ -40,6 +49,6 @@ val Yellow500 = Color(0xFFE5A900)
 val Blue50 = Color(0xFFEEF4FF)
 val Blue500 = Color(0xFF3B7DFF)
 
-internal val DarkBackground = Color(0xFF0F1712)
-internal val DarkSurface = Color(0xFF162019)
-internal val DarkSurfaceVariant = Color(0xFF243028)
+internal val DarkBackground = ZapasliInk
+internal val DarkSurface = ZapasliInkSoft
+internal val DarkSurfaceVariant = Color(0xFF24463B)

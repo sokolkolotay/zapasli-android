@@ -15,6 +15,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
@@ -82,7 +83,7 @@ class PantryScreenTest {
 
         waitForText("product_name", "Milk")
 
-        composeRule.onNodeWithTag("edit_product").performClick()
+        composeRule.onNodeWithTag("edit_product", useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag("product_name_input").performTextClearance()
         composeRule.onNodeWithTag("product_name_input").performTextInput("Yogurt")
         composeRule.onNodeWithTag("save_product")
@@ -91,7 +92,7 @@ class PantryScreenTest {
 
         waitForText("product_name", "Yogurt")
 
-        composeRule.onNodeWithTag("delete_product").performClick()
+        composeRule.onNodeWithTag("delete_product", useUnmergedTree = true).performClick()
         waitForTag("empty_pantry")
         composeRule.onNodeWithTag("empty_pantry").assertIsDisplayed()
     }
@@ -105,7 +106,8 @@ class PantryScreenTest {
     private fun waitForText(tag: String, text: String) {
         composeRule.waitUntil(timeoutMillis = 5_000) {
             runCatching {
-                composeRule.onNodeWithTag(tag).assertTextEquals(text)
+                composeRule.onNodeWithTag("pantry_list").performScrollToIndex(3)
+                composeRule.onNodeWithTag(tag, useUnmergedTree = true).assertTextEquals(text)
             }.isSuccess
         }
     }
@@ -138,7 +140,6 @@ private fun PantryTestHarness() {
         onRetry = {},
         userDisplayName = "Test User",
         isSessionOffline = false,
-        onLogout = {},
     )
 
     if (showEditor) {

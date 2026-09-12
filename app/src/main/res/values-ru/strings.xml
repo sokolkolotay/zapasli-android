@@ -2,14 +2,12 @@
 <resources>
     <string name="app_name">Zapasli</string>
     <string name="pantry_title">Мои запасы</string>
-    <string name="pantry_user_summary">%1$s · %2$s</string>
     <plurals name="pantry_item_count">
         <item quantity="one">%d продукт</item>
         <item quantity="few">%d продукта</item>
         <item quantity="many">%d продуктов</item>
         <item quantity="other">%d продукта</item>
     </plurals>
-    <string name="attention_title">Требует внимания</string>
     <plurals name="attention_item_count">
         <item quantity="one">%d продукт пора использовать</item>
         <item quantity="few">%d продукта пора использовать</item>
@@ -17,7 +15,6 @@
         <item quantity="other">%d продукта пора использовать</item>
     </plurals>
     <string name="everything_fresh_title">Всё свежее</string>
-    <string name="everything_fresh_description">Срочных продуктов пока нет</string>
     <string name="filter_all">Все</string>
     <string name="filter_expiring_soon">Скоро испортятся</string>
     <string name="filter_expired">Просрочено</string>
@@ -132,4 +129,43 @@
     <string name="error_rate_limited">Слишком много попыток. Повторите позже</string>
     <string name="error_auth_network">Сервер недоступен. Проверьте подключение к интернету</string>
     <string name="error_auth_server">Что-то пошло не так. Попробуйте ещё раз</string>
+    <string name="family_home_title">Дом семьи Колотай</string>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_short">Настройки</string>
+    <string name="back">Назад</string>
+    <string name="search_products">Найти продукт</string>
+    <string name="products_tracked">продуктов на учёте дома</string>
+    <string name="settings_theme_title">Оформление</string>
+    <string name="settings_theme_description">Выберите, как Zapasli выглядит на этом устройстве.</string>
+    <string name="theme_system">Как в системе</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="settings_language_title">Язык</string>
+    <string name="settings_language_description">Используйте язык системы или выберите русский либо английский.</string>
+    <string name="language_system">Язык системы</string>
+    <string name="language_english">English</string>
+    <string name="language_russian">Русский</string>
+    <string name="settings_filter_title">Фильтр кладовой по умолчанию</string>
+    <string name="settings_filter_description">Этот фильтр применяется при открытии списка продуктов.</string>
+    <string name="settings_about_title">О Zapasli</string>
+    <string name="settings_about_description">Семейный учёт продуктов со сроками годности, штрихкодами и КБЖУ. Приложение подключается к Zapasli API по HTTPS.</string>
+    <string name="product_details_title">О продукте</string>
+    <string name="product_not_found">Этого продукта больше нет в кладовой.</string>
+    <string name="product_details_storage">Хранение и срок годности</string>
+    <string name="product_details_identification">Информация о продукте</string>
+    <string name="product_details_updated">Обновлено</string>
+    <string name="product_details_no_nutrition">КБЖУ не указаны</string>
+    <string name="product_details_not_specified">Не указано</string>
+    <plurals name="product_details_expired">
+        <item quantity="one">Просрочено на %d день</item>
+        <item quantity="few">Просрочено на %d дня</item>
+        <item quantity="many">Просрочено на %d дней</item>
+        <item quantity="other">Просрочено на %d дня</item>
+    </plurals>
+    <plurals name="product_details_days_left">
+        <item quantity="one">Остался %d день</item>
+        <item quantity="few">Осталось %d дня</item>
+        <item quantity="many">Осталось %d дней</item>
+        <item quantity="other">Осталось %d дня</item>
+    </plurals>
 </resources>

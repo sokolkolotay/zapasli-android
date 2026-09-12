@@ -6,4 +6,6 @@ interface UserPreferencesRepository {
     val userPreferences: Flow<UserPreferences>
 
     suspend fun setThemeMode(themeMode: ThemeMode)
+
+    suspend fun setDefaultPantryFilter(filter: PantryFilterPreference)
 }

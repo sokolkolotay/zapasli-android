@@ -17,6 +17,7 @@ import javax.inject.Singleton
 
 private const val USER_PREFERENCES_FILE = "user_preferences"
 private val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+private val DEFAULT_PANTRY_FILTER_KEY = stringPreferencesKey("default_pantry_filter")
 private val Context.userPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_PREFERENCES_FILE,
 )
@@ -40,6 +41,9 @@ class DataStoreUserPreferencesRepository @Inject constructor(
                     themeMode = preferences[THEME_MODE_KEY]
                         ?.let(::themeModeFromStoredValue)
                         ?: ThemeMode.SYSTEM,
+                    defaultPantryFilter = preferences[DEFAULT_PANTRY_FILTER_KEY]
+                        ?.let(::pantryFilterFromStoredValue)
+                        ?: PantryFilterPreference.ALL,
                 )
             }
 
@@ -48,7 +52,17 @@ class DataStoreUserPreferencesRepository @Inject constructor(
             preferences[THEME_MODE_KEY] = themeMode.name
         }
     }
+
+    override suspend fun setDefaultPantryFilter(filter: PantryFilterPreference) {
+        context.userPreferencesDataStore.edit { preferences ->
+            preferences[DEFAULT_PANTRY_FILTER_KEY] = filter.name
+        }
+    }
 }
 
 private fun themeModeFromStoredValue(value: String): ThemeMode =
     ThemeMode.entries.firstOrNull { it.name == value } ?: ThemeMode.SYSTEM
+
+private fun pantryFilterFromStoredValue(value: String): PantryFilterPreference =
+    PantryFilterPreference.entries.firstOrNull { it.name == value }
+        ?: PantryFilterPreference.ALL

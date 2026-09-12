@@ -69,6 +69,18 @@ class PantryUiStateTest {
         assertEquals(null, validatePantryItemInput(validInput()))
     }
 
+    @Test
+    fun `search matches product name and barcode ignoring case`() {
+        val milk = item("milk", today.plusDays(2)).copy(
+            name = "Oat Milk",
+            barcode = "4601234567890",
+        )
+        val apples = item("apples", today.plusDays(5)).copy(name = "Apples")
+
+        assertEquals(listOf("milk"), searchPantryItems(listOf(milk, apples), "MILK").map(PantryItem::id))
+        assertEquals(listOf("milk"), searchPantryItems(listOf(milk, apples), "456789").map(PantryItem::id))
+    }
+
     private fun item(id: String, expiry: LocalDate?) = PantryItem(
         id = id,
         name = id,
