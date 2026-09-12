@@ -5,7 +5,7 @@
 Android-приложение для семейного учёта домашних продуктов: сроки годности, места хранения, штрихкоды и КБЖУ.
 
 - Сайт продукта: [zapasli.sokolkolotaj.ru](https://zapasli.sokolkolotaj.ru/)
-- Production API: [api.zapasli.sokolkolotaj.ru](https://api.zapasli.sokolkolotaj.ru/health)
+- Production API: [api.zapasli.sokolkolotaj.ru](https://api.zapasli.sokolkolotaj.ru/health/ready)
 - Swagger/OpenAPI: [api.zapasli.sokolkolotaj.ru/swagger](https://api.zapasli.sokolkolotaj.ru/swagger)
 
 ## Возможности дипломной версии
